@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS 💛🖤</title>
+    <link rel="stylesheet" href="/css/site.css">
+    <link rel="icon" href="img/logo.jpg">
+    <style>
+        li ul {
+            display: none;
+        }
+        li.open > ul {
+            display: block;
+        }
+        th, td {
+            border: 1px solid black;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        td > * {
+            max-width: 10vw;
+            max-height: 20vh;
+        }
+    </style>
+</head>
+<body>
+    {{groupsHtml}}
+    <h2>Request:</h2>
+    <table style="border: 1px solid black; border-collapse: collapse">
+        <tr>
+            <td style="border: 1px solid black">method</td>
+            <td style="border: 1px solid black">{{method}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black">protocol</td>
+            <td style="border: 1px solid black">{{httpVersion}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black">path</td>
+            <td style="border: 1px solid black">{{url}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black">route</td>
+            <td style="border: 1px solid black">{{path}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black">query</td>
+            <td style="border: 1px solid black">{{query}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black">controller</td>
+            <td style="border: 1px solid black">{{controller}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black">action</td>
+            <td style="border: 1px solid black">{{action}}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid black">slug</td>
+            <td style="border: 1px solid black">{{slug}}</td>
+        </tr>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th>jpg</th>
+                <th>png</th>
+                <th>webp</th>
+                <th>bmp</th>
+                <th>gif</th>
+                <th>mp3</th>
+                <th>mp4</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><img src="/img/JavaScript-logo.jpg" alt="logo" /></td>
+                <td><img src="/img/emoji.png" alt="logo" /></td>
+                <td><img src="/img/fade.webp" alt="logo" /></td>
+                <td><img src="/img/wow.bmp" alt="logo" /></td>
+                <td><img src="/img/3d-gif-4.gif" alt="logo" /></td>
+                <td><audio controls><source src="/media/medieval.mp3"></audio></td>
+                <td><video controls><source src="/media/pigeon.mp4"></video></td>
+            </tr>
+        </tbody>
+    </table>
+    <script>
+        document.querySelectorAll('li').forEach(li => {
+            if (li.querySelector('ul')) {
+                li.classList.add('has-children')
+                li.addEventListener('click', e => {
+                    if (e.target === li)
+                        li.classList.toggle('open')
+                })
+            }
+        })
+    </script>
+    <script src="/js/site.js"></script>
+</body>
+</html>
