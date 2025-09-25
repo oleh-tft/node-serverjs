@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester</title>
+    <style>
+        .item {
+            border: 1px solid goldenrod;
+            padding: 1rem;
+        }
+        .key {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+        .value {
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <a href="test_suite_2.html">Feedback Controller</a>
+    <h1>Випробування API Client Controller</h1>
+    <button onclick="testGet()">GET</button>
+    <button onclick="testPost()">POST</button>
+    <button onclick="testPut()">PUT</button>
+    <button onclick="testPatch()">PATCH</button>
+    <button onclick="testDelete()">DELETE</button>
+    <p id="out"></p>
+    <script>
+        function testGet() {
+            fetch("/api/client", {
+                method: "GET",
+                headers: {
+                    "Connection": "close",
+                    "Accept": "application/json"
+                }
+            }).then(r => r.text())
+            .then(j => {
+                out.innerText = j
+            })
+        }
+        function testPost() {
+            fetch("/api/client", {
+                method: "POST"
+            }).then(r => r.json())
+            .then(j => {
+                out.innerHTML = ''
+                for (k in j) {
+                    out.innerHTML += `
+                    <div class="item">
+                        <span class="key">${k}:</span> 
+                        <span class="value">${j[k]}</span>
+                    </div>`
+                }
+            })
+        }
+        function testPut() {
+            fetch("/api/client", {
+                method: "PUT"
+            }).then(r => r.json())
+            .then(j => {
+                out.innerHTML = ''
+                for (k in j) {
+                    out.innerHTML += `
+                    <div class="item">
+                        <span class="key">${k}:</span> 
+                        <span class="value">${j[k]}</span>
+                    </div>`
+                }
+            })
+        }
+        function testPatch() {
+            fetch("/api/client", {
+                method: "PATCH"
+            }).then(r => r.json())
+            .then(j => {
+                out.innerHTML = ''
+                for (k in j) {
+                    out.innerHTML += `
+                    <div class="item">
+                        <span class="key">${k}:</span> 
+                        <span class="value">${j[k]}</span>
+                    </div>`
+                }
+            })
+        }
+        function testDelete() {
+            fetch("/api/client", {
+                method: "DELETE"
+            }).then(r => r.json())
+            .then(j => {
+                out.innerHTML = ''
+                for (k in j) {
+                    out.innerHTML += `
+                    <div class="item">
+                        <span class="key">${k}:</span> 
+                        <span class="value">${j[k]}</span>
+                    </div>`
+                }
+            })
+        }
+    </script>
+</body>
+</html>
