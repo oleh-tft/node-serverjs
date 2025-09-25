@@ -23,6 +23,21 @@ const loadControllersTask = fs.readdir(CONTROLLERS_PATH)
         }
     })
 
+const apiControllers = {}
+const API_PATH = CONTROLLERS_PATH + "api/"
+const loadApiControllersTask = fs.readdir(API_PATH)
+    .then(async (filenames) => {
+        for (let filename of filenames) {
+            let pos = filename.indexOf(CONTROLLER_FILE_SUFFIX)
+            if (pos != -1) {
+                const controllerName = filename.substring(0, pos)
+                apiControllers[controllerName] = (await
+                    import(API_PATH + filename)
+                ).default
+            }
+        }
+    })
+
 const dbIniFile = await fs.open(dbIniFilename, 'r')
 let dbConfig = {}
 
@@ -82,8 +97,21 @@ async function serverFunction(request, response) {
         id = null;
     }
     console.log(controller, action, id);
-
-    if (typeof controllers[controller] == 'function') {
+    if (controller == 'api') {
+        if (typeof apiControllers[action] == 'function') {
+            const apiControllerObject = new apiControllers[action]
+            apiControllerObject.dbPool = dbPool
+            const apiAction = 'do' + request.method.charAt(0).toUpperCase() + request.method.slice(1).toLowerCase()
+            if (typeof apiControllerObject[apiAction] == 'function') {
+                apiControllerObject[apiAction](request, response, id)
+                return
+            } else {
+                response.writeHead(405)
+                response.end()
+                return
+            } 
+        }
+    } else if (typeof controllers[controller] == 'function') {
         const controllerObject = new controllers[controller]
         controllerObject.dbPool = dbPool
         if (typeof controllerObject[action] == 'function') {
@@ -113,7 +141,8 @@ process.on('SIGINT', () => {
 })
 
 await loadControllersTask
-console.log(controllers)
+await loadApiControllersTask
+console.log(controllers, apiControllers)
 
 server.listen(HTTP_PORT, () => {
     console.log('Server listening port', HTTP_PORT)
