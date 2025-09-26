@@ -21,7 +21,14 @@
     <a href="test_suite_2.html">Feedback Controller</a>
     <h1>Випробування API Client Controller</h1>
     <button onclick="testGet()">GET</button>
-    <button onclick="testPost()">POST</button>
+    <div>
+        <input name="user-name" type="text"> <br/>
+        <input name="user-email" type="email"> <br/>
+        <input name="user-phone" type="tel"> <br/>
+
+        <button onclick="testPost()">POST</button>
+    </div>
+
     <button onclick="testPut()">PUT</button>
     <button onclick="testPatch()">PATCH</button>
     <button onclick="testDelete()">DELETE</button>
@@ -34,30 +41,54 @@
                     "Connection": "close",
                     "Accept": "application/json"
                 }
-            }).then(r => r.text())
+            })
+            .then(r => r.text())
             .then(j => {
                 out.innerText = j
             })
         }
         function testPost() {
+            const userName = document.querySelector('[name="user-name"]').value
+            const userEmail = document.querySelector('[name="user-email"]').value
+            const userPhone = document.querySelector('[name="user-phone"]').value
+            const data = {userName, userEmail, userPhone}
             fetch("/api/client", {
-                method: "POST"
-            }).then(r => r.json())
-            .then(j => {
-                out.innerHTML = ''
-                for (k in j) {
-                    out.innerHTML += `
-                    <div class="item">
-                        <span class="key">${k}:</span> 
-                        <span class="value">${j[k]}</span>
-                    </div>`
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(r => {
+                //console.log(r.headers.get('Content-Type'))
+                if (r.status != 200) {
+                    out.innerHTML = `<div style="color: darkred">Сервер відповів помилкою ${r.status}</div>`
+                } else {
+                    let ct = r.headers.get('Content-Type')
+                    if (validContentType(ct)) {
+                        r.json()
+                        .then(j => {
+                            out.innerHTML = ''
+                            for (k in j) {
+                                out.innerHTML += `
+                                <div class="item">
+                                    <span class="key">${k}:</span> 
+                                    <span class="value">${j[k]}</span>
+                                </div>`
+                            }
+                        })
+                    } else {
+                        out.innerHTML = `<div style="color: darkred">Відповідь Сервера не є JSON '${ct}'</div>`
+                    }
                 }
             })
         }
+
         function testPut() {
             fetch("/api/client", {
                 method: "PUT"
-            }).then(r => r.json())
+            })
+            .then(r => r.json())
             .then(j => {
                 out.innerHTML = ''
                 for (k in j) {
@@ -72,7 +103,8 @@
         function testPatch() {
             fetch("/api/client", {
                 method: "PATCH"
-            }).then(r => r.json())
+            })
+            .then(r => r.json())
             .then(j => {
                 out.innerHTML = ''
                 for (k in j) {
@@ -87,7 +119,8 @@
         function testDelete() {
             fetch("/api/client", {
                 method: "DELETE"
-            }).then(r => r.json())
+            })
+            .then(r => r.json())
             .then(j => {
                 out.innerHTML = ''
                 for (k in j) {
@@ -98,6 +131,18 @@
                     </div>`
                 }
             })
+        }
+        function validContentType(str) {
+            if (typeof str != 'string') return false
+
+            const jsonType = 'application/json'
+            if (str.startsWith(jsonType)) {
+                if (str === jsonType || str[jsonType.length] == ';') {
+                    return true
+                }
+            }
+
+            return false
         }
     </script>
 </body>
