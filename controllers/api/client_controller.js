@@ -1,12 +1,13 @@
 export default class ClientController {
     
     doGet(request, response, id) {
-        response.writeHead(200)
+        response.writeHead(200, {
+            'Access-Control-Allow-Origin': '*'
+        })
         response.end("ClientController")
     }
 
     doPost(request, response, id) {
-        //Прийом тіла запиту
         let body = ''
         request.on('data', function(chunk) { body += chunk })
         request.on('end', function() {
@@ -17,7 +18,8 @@ export default class ClientController {
                     if (typeof data == 'object')
                         data = JSON.stringify(data)
                     response.writeHead(200, {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
                     })
                     response.end(JSON.stringify({
                         "controller": "ClientController",
@@ -26,23 +28,16 @@ export default class ClientController {
                         "body": data
                     }))
             } else {
-                response.writeHead(415) // Unsupported Media Type
+                response.writeHead(415)
                 response.end()
             }
         })
-        //response.writeHead(200, {
-        //    'Content-Type': 'application/json'
-        //})
-        //response.end(JSON.stringify(
-        //    {
-        //        "controller": "ClientController",
-        //        "method": "POST",
-        //        "semantic": "Create"
-        //    }))
     }
 
     doPut(request, response, id) {
-        response.writeHead(200)
+        response.writeHead(200, {
+            'Access-Control-Allow-Origin': '*'
+        })
         response.end(JSON.stringify(
             {
                 "controller": "ClientController",
@@ -69,6 +64,15 @@ export default class ClientController {
                 "method": "DELETE",
                 "semantic": "Delete"
             }))
+    }
+
+    doOptions(request, response) {
+        response.writeHead(200, {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE',
+            'Access-Control-Allow-Headers': '*'
+        })
+        response.end()
     }
 }
 
