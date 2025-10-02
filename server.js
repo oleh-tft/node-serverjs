@@ -162,3 +162,25 @@ server.listen(HTTP_PORT, () => {
 // HEAD, TRACE, CONNECT,
 // OPTIONS
 // no body allowed for GET and HEAD
+
+/*
+CORS - Cross-Origin Resource Sharing - обмеження, згідно з яким дані, що передаються ресурсами з різних джерел (походжень)
+Cross-Origin якщо різні:
+- scheme (http / https)
+- host
+- port
+Клієнт (браузер) повинен заблокувати CORS дані, якщо у відповіді сервера відсутні заголовки, які це дозволяють
+
+Якщо метод запиту відрізняється від GET, то перед самим запитом
+надсилається 'preflight' запит методом OPTIONS з передачею
+питання заголовком access-control-request-method
+У відповіді мають бути дозволені заголовки
+
+Access-Control-Allow-Origin
+Access-Control-Allow-Methods
+
+Також за CORS вважаються забороненими майже усі заголовки запиту,
+зокрема, Content-Type. Для дозволу таких запитів необхідно додати заголовок
+Access-Control-Allow-Headers
+до відповіді preflight
+*/
