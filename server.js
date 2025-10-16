@@ -2,7 +2,7 @@ import http from "http"
 import * as fs from "node:fs/promises"
 import mysql2 from 'mysql2'
 import GroupDao from './dao/groupDao.js'
-import { getAllowedMimeType } from './helper.js'
+import { getAllowedMimeType, getSignature, getToken } from './helper.js'
 
 const dbIniFilename = 'db.ini'
 const HTTP_PORT = 81;
@@ -96,11 +96,13 @@ async function serverFunction(request, response) {
     } else {
         id = null;
     }
-    console.log(controller, action, id);
+    const services = {
+        getAllowedMimeType, dbPool, getSignature, getToken
+    }
     if (controller == 'api') {
         if (typeof apiControllers[action] == 'function') {
-            const apiControllerObject = new apiControllers[action]
-            apiControllerObject.dbPool = dbPool
+            const apiControllerObject = new apiControllers[action](services)
+            //apiControllerObject.dbPool = dbPool
             const apiAction = 'do' + request.method.charAt(0).toUpperCase() + request.method.slice(1).toLowerCase()
             if (typeof apiControllerObject[apiAction] == 'function') {
                 apiControllerObject[apiAction](request, response, id)
@@ -112,8 +114,8 @@ async function serverFunction(request, response) {
             } 
         }
     } else if (typeof controllers[controller] == 'function') {
-        const controllerObject = new controllers[controller]
-        controllerObject.dbPool = dbPool
+        const controllerObject = new controllers[controller](services)
+        //controllerObject.dbPool = dbPool
         if (typeof controllerObject[action] == 'function') {
             controllerObject[action](request, response, id)
             return
@@ -164,6 +166,26 @@ server.listen(HTTP_PORT, () => {
 // no body allowed for GET and HEAD
 
 /*
+АРІ Application Program Interface
+
+                Program - інформаційний "центр"
+             /    |    \
+      Web        API       Mobile
+  Application     |      Application - самостійна програма, 
+                  |                    яка взаємодіє з Програмою
+               зовнішні
+               програми
+
+
+(також Додаток - несамостійна програма, плагін, addon, розширення)
+
+Web-API - базується на НТТР
+CRUD-повнота -- забезпечення повного життєвого циклу даних
+Create   POST
+Read     GET  
+Update   PUT(replace), PATCH(partially update)
+Delete   DELETE
+
 CORS - Cross-Origin Resource Sharing - обмеження, згідно з яким дані, що передаються ресурсами з різних джерел (походжень)
 Cross-Origin якщо різні:
 - scheme (http / https)
@@ -183,4 +205,22 @@ Access-Control-Allow-Methods
 зокрема, Content-Type. Для дозволу таких запитів необхідно додати заголовок
 Access-Control-Allow-Headers
 до відповіді preflight
+
+Layered System - можливість створення проміжних шарів на шляху проходження
+запиту від клієнта до сервера
+
+Client              PROXY               Server
+Get /hello ---------> --------------------> 401 Unauthorized
+                      <--------------------
+    <-------------- 500 - не зміг виконати запит
+
+Get /hello ---------> --------------------> 200 Ok {
+                                            inner: 401 Unauthorized
+                      <-------------------- }
+    <-------------- 200 Ok
+
+Unicode - правила кодування 
+UTF-8 - таблиця кодування
+
+ндтзі
 */
