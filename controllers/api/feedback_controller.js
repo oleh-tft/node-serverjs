@@ -34,22 +34,33 @@ export default class FeedbackController {
     }
 
     doPost(request, response, id) {
-        response.writeHead(200, {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json'
-        })
-        this.restResponse.meta.method = request.method
-        this.restResponse.meta.slug = id
-        this.restResponse.meta.cache = 86400
-        this.restResponse.meta.dataType = "string"
-        this.restResponse.data = JSON.stringify(
-            {
-                "controller": "FeedbackController",
-                "method": "POST",
-                "semantic": "Create"
-            })
+        let body = ''
+        request.on('data', function(chunk) { body += chunk })
+        request.on('end', async () => {
+            console.log('ClientController::doPost body: ' + body)
+            console.log(request.headers['content-type'])
+            if (validContentType(request.headers['content-type'])) {
+                    let data = JSON.parse(body)
+                    response.writeHead(200, {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    })
+                    this.restResponse.meta.method = request.method
+                    this.restResponse.meta.slug = id
+                    this.restResponse.meta.cache = 0
+                    this.restResponse.meta.dataType = "string"
 
-        response.end(JSON.stringify(this.restResponse))
+                    try {
+                        this.restResponse.data = "FeedbackController"
+                    } catch(err) {
+                        this.restResponse.data = err
+                    }
+                    response.end(JSON.stringify(this.restResponse))
+            } else {
+                response.writeHead(415) // Unsupported Media Type
+                response.end()
+            }
+        })
     }
 
     doPut(request, response, id) {
@@ -103,4 +114,17 @@ export default class FeedbackController {
         response.end()
     }
 
+}
+
+function validContentType(str) {
+    if (typeof str != 'string') return false
+
+    const jsonType = 'application/json'
+    if (str.startsWith(jsonType)) {
+        if (str === jsonType || str[jsonType.length] == ';') {
+            return true
+        }
+    }
+
+    return false
 }
